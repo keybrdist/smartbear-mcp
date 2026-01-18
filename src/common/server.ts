@@ -59,7 +59,8 @@ export class SmartBearMcpServer extends McpServer {
     await client.registerTools(
       (params, cb) => {
         const rawToolName = `${client.toolPrefix}_${params.title.replace(/\s+/g, "_").toLowerCase()}`;
-        const toolName = rawToolName.length > 64 ? rawToolName.slice(0, 64) : rawToolName;
+        const toolName =
+          rawToolName.length > 64 ? rawToolName.slice(0, 64) : rawToolName;
         const toolTitle = `${client.name}: ${params.title}`;
         return super.registerTool(
           toolName,

@@ -111,6 +111,29 @@ describe("SmartBearMcpServer", () => {
       expect(vi.mocked(Bugsnag.notify)).not.toHaveBeenCalled();
     });
 
+    it("should truncate tool names longer than 64 characters", async () => {
+      await server.addClient(mockClient);
+
+      const registerFn = mockClient.registerTools.mock.calls[0][0];
+      const registerCbMock = vi.fn();
+      const longTitle =
+        "This is a really long tool title that should be truncated by the server";
+      registerFn(
+        {
+          title: longTitle,
+          summary: "A test tool",
+        },
+        registerCbMock,
+      );
+
+      const registerToolParams = superRegisterToolMock.mock.calls[0];
+      const rawToolName = `${mockClient.toolPrefix}_${longTitle.replace(/\s+/g, "_").toLowerCase()}`;
+      const expectedToolName = rawToolName.slice(0, 64);
+
+      expect(registerToolParams[0]).toBe(expectedToolName);
+      expect(registerToolParams[0].length).toBe(64);
+    });
+
     it("should throw error when asked to call non-configured tool", async () => {
       await server.addClient(mockClient);
 
